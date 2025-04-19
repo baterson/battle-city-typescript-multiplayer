@@ -1,37 +1,24 @@
 {
-	"name": "battle-city-typescript",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"homepage": "https://baterson.github.io/battle-city-typescript",
-	"scripts": {
-		"build": "webpack -p",
-		"start": "webpack-dev-server -d --content-base ./public",
-		"predeploy": "npm run build",
-		"deploy": "gh-pages -d public"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/baterson/battle-city-typescript"
-	},
-	"author": "https://github.com/baterson",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/baterson/issues"
-	},
-	"dependencies": {
-		"@types/node": "^10.12.0"
-	},
-	"devDependencies": {
-		"file-loader": "^2.0.0",
-		"gh-pages": "^2.0.1",
-		"image-webpack-loader": "^4.4.0",
-		"img-loader": "^3.0.0",
-		"ts-loader": "^5.0.0",
-		"typescript": "^3.2.2",
-		"url-loader": "^1.1.2",
-		"webpack": "^4.17.2",
-		"webpack-cli": "^3.1.0",
-		"webpack-dev-server": "^3.1.8"
-	}
+  "name": "battle-city-typescript-multiplayer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "homepage": "https://baterson.github.io/battle-city-typescript",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baterson/battle-city-typescript"
+  },
+  "author": "https://github.com/baterson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/baterson/issues"
+  },
+  "devDependencies": {
+    "vite": "^6.3.2"
+  }
 }
