@@ -5,9 +5,12 @@
   "main": "index.js",
   "homepage": "https://baterson.github.io/battle-city-typescript",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev:client": "vite",
+    "build:client": "vite build",
+    "preview:client": "vite preview",
+    "dev:server": "tsx watch src/server/index.ts",
+    "build:server": "tsup server/index.ts --outDir dist/server",
+    "start:server": "node dist/server/index.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +22,13 @@
     "url": "https://github.com/baterson/issues"
   },
   "devDependencies": {
+    "@types/node": "^22.14.1",
+    "@types/ws": "^8.18.1",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
     "vite": "^6.3.2"
+  },
+  "dependencies": {
+    "ws": "^8.18.1"
   }
 }
