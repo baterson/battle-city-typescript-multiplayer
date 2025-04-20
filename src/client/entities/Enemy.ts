@@ -1,9 +1,5 @@
 import { Tank } from "./Tank";
-import {
-  assetsHolder,
-  animateVariableSprites,
-  checkEntityCollision,
-} from "../utils";
+import { assetsHolder, checkEntityCollision } from "../utils";
 import { Direction, PowerupTypes, TankTypes, Vector, Tile } from "../types";
 import {
   TANK_SIZE,
@@ -29,6 +25,7 @@ function powerupObserver(this: Enemy, powerupType) {
 Class describing all enemy tanks
 */
 export class Enemy extends Tank {
+  entityType = "Enemy";
   type: TankTypes;
   lives: number;
   // sets when entity changes the direction
@@ -46,6 +43,14 @@ export class Enemy extends Tank {
 
     this.timeManager.setTimer("spawn", SPAWN_FRAMES);
     powerupEvents.subscribe(this.id, powerupObserver.bind(this));
+  }
+
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      lives: this.lives,
+      type: this.type,
+    };
   }
 
   update(game: HeadlessGame) {
@@ -66,25 +71,33 @@ export class Enemy extends Tank {
       this.aiMove();
       this.shot(ENEMY_STATS[this.type].shotCD, game);
     }
+
+    this.animateSprite();
   }
 
   render() {
+    this.sprite(this.position, this.size);
+  }
+
+  animateSprite() {
     const spawn = this.timeManager.getTimer("spawn");
     const death = this.timeManager.getTimer("death");
 
     if (spawn) {
-      return animateVariableSprites(
+      return this.animateVariableSprites(
         this.position,
         assetsHolder.variableSprites.tankSpawn,
         SPAWN_FRAMES,
-        spawn
+        spawn,
+        "tankSpawn"
       );
     } else if (death) {
-      return animateVariableSprites(
+      return this.animateVariableSprites(
         this.position,
         assetsHolder.variableSprites.tankDestruction,
         DEATH_FRAMES,
-        death
+        death,
+        "tankDestruction"
       );
     }
 

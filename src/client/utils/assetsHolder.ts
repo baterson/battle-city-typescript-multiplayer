@@ -10,7 +10,7 @@ import {
   TrackNames,
   Vector,
 } from "../types";
-import type { Audio } from "../types";
+import type { Audio, Sprite } from "../types";
 
 const createSprite =
   (image: HTMLImageElement, context: CanvasRenderingContext2D) =>
@@ -29,9 +29,15 @@ const createSprite =
     );
   };
 
-const setupSprites = (image: HTMLImageElement): Sprites => {
-  const mainSprite = createSprite(image, main.context);
-  const dashboardSprite = createSprite(image, dashboard.context);
+const setupSprites = (image?: HTMLImageElement): Sprites => {
+  const noop = (...args: any[]) => ({} as Sprite);
+  let mainSprite = noop;
+  let dashboardSprite = noop;
+
+  if (image) {
+    mainSprite = createSprite(image, main.context);
+    dashboardSprite = createSprite(image, dashboard.context);
+  }
 
   return {
     player: {
@@ -230,8 +236,13 @@ const setupSprites = (image: HTMLImageElement): Sprites => {
   };
 };
 
-const setupVariableSprites = (image: HTMLImageElement): VariableSprites => {
-  const mainSprite = createSprite(image, main.context);
+const setupVariableSprites = (image?: HTMLImageElement): VariableSprites => {
+  const noop = (...args: any[]) => ({} as Sprite);
+  let mainSprite = noop;
+
+  if (image) {
+    mainSprite = createSprite(image, main.context);
+  }
 
   return {
     tankSpawn: [
@@ -311,6 +322,13 @@ class AssetsHolder {
         })
     );
     return Promise.all(loaders);
+  }
+
+  loadServer() {
+    if (!this.sprites || !this.variableSprites) {
+      this.sprites = setupSprites();
+      this.variableSprites = setupVariableSprites();
+    }
   }
 }
 

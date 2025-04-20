@@ -4,7 +4,7 @@ import { FLAG_SIZE, FLAG_POSITION } from "../constants";
 import { isBullet } from "./guards";
 
 export class Flag extends Entity {
-  type = "Flag";
+  entityType = "Flag";
   isDestroyed = false;
 
   constructor() {

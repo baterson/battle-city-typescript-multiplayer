@@ -1,11 +1,13 @@
 import { createServer } from "http";
 import { WebSocketServer } from "ws";
 import { randomUUID } from "crypto";
+import { assetsHolder } from "../client/utils/assetsHolder";
 import { startServer } from "../client/startServer";
 
 const server = createServer();
 const wss = new WebSocketServer({ noServer: true });
 const rooms: Record<string, WebSocket[]> = {};
+assetsHolder.loadServer();
 
 server.on("upgrade", (req, socket, head) => {
   wss.handleUpgrade(req, socket, head, (ws) => {

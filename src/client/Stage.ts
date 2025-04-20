@@ -45,6 +45,7 @@ export class Stage {
       number: this.number,
       tanks: this.tanks,
       powerupsAvailable: this.powerupsAvailable,
+      tiles: this.map.toJSON(),
     };
   }
 

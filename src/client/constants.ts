@@ -52,7 +52,7 @@ export const FREEZE_FRAMES = 200;
 export const POWERUP_SPAWN_CD = 600;
 export const POWERUP_BLINK_FRAMES = 200;
 export const ENEMY_SPAWN_CD = 400;
-// TODO: change back
+// TODO: c
 // export const SCREEN_FADE_FRAMES = 300;
 export const SCREEN_FADE_FRAMES = 1;
 

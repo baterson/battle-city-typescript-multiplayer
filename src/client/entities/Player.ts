@@ -1,5 +1,5 @@
 import { Tank } from "./Tank";
-import { assetsHolder, animateVariableSprites } from "../utils";
+import { assetsHolder } from "../utils";
 import {
   Direction,
   PowerupTypes,
@@ -36,7 +36,7 @@ function powerupObserver(this: Player, powerupType: PowerupTypes) {
 }
 
 export class Player extends Tank {
-  type = "Player";
+  entityType = "Player";
   lives: number;
   // Upgrades from power-ups
   power: PlayerPower;
@@ -92,32 +92,41 @@ export class Player extends Tank {
     }
     this.soundManager.play("neutral");
     this.processInput(game);
+    this.animateSprite();
   }
 
   render() {
+    this.sprite(this.position, this.size);
+  }
+
+  animateSprite() {
     const spawn = this.timeManager.getTimer("spawn");
     const death = this.timeManager.getTimer("death");
     const invincible = this.timeManager.getTimer("invincible");
 
     if (spawn) {
-      return animateVariableSprites(
+      return this.animateVariableSprites(
         this.position,
         assetsHolder.variableSprites.tankSpawn,
         SPAWN_FRAMES,
-        spawn
+        spawn,
+        "tankSpawn"
       );
     } else if (death) {
-      return animateVariableSprites(
+      return this.animateVariableSprites(
         this.position,
         assetsHolder.variableSprites.tankDestruction,
         DEATH_FRAMES,
-        death
+        death,
+        "tankDestruction"
       );
     } else if (invincible) {
-      const invincibleSprites = assetsHolder.sprites.invincible;
-      const index = invincible % invincibleSprites.length;
-      invincibleSprites[index](this.position, this.size);
+      // TODO: fix it
+      //   const invincibleSprites = assetsHolder.sprites.invincible;
+      //   const index = invincible % invincibleSprites.length;
+      //   invincibleSprites[index](this.position, this.size);
     }
+
     this.animateMovement(
       assetsHolder.sprites.player[this.power][this.direction]
     );

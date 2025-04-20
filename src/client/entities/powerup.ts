@@ -34,6 +34,7 @@ export class PowerupEvents {
 export const powerupEvents = new PowerupEvents();
 
 export class Powerup extends Entity {
+  entityType = "Powerup";
   public type: PowerupTypes;
   public soundManager: SoundManager<"powerup">;
   public timeManager: TimeManager<"live" | "blink">;
@@ -44,6 +45,13 @@ export class Powerup extends Entity {
     this.timeManager = new TimeManager();
     this.soundManager = new SoundManager(["powerup"]);
     this.timeManager.setTimer("live", POWERUP_SPAWN_CD);
+  }
+
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      type: this.type,
+    };
   }
 
   update(game: HeadlessGame) {

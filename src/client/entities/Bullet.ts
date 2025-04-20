@@ -16,7 +16,7 @@ import { isPlayer, isEnemy, isPowerup } from "./guards";
 import { assetsHolder } from "../utils";
 
 export class Bullet extends Movable {
-  type = "Bullet";
+  entityType = "Bullet";
   prevPosition: Vector;
   direction: Direction;
   shooter: Player | Enemy;
@@ -31,10 +31,11 @@ export class Bullet extends Movable {
 
   update() {
     this.move(BULLET_VELOCITY);
+    this.animateMovement(assetsHolder.sprites.bullet[this.direction]);
   }
 
   render() {
-    this.animateMovement(assetsHolder.sprites.bullet[this.direction]);
+    this.sprite(this.position, this.size);
   }
 
   resolveEdgeCollision(entityManager: EntityManager) {

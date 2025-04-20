@@ -5,7 +5,7 @@ import { BoundingBox, Vector } from "../types";
 Base Entity. All entities derives from this class.
 */
 export class Entity {
-  type = "Entity";
+  entityType = "Entity";
   static numberGen: number = 0;
   id: number;
   position: Vector;
@@ -32,7 +32,7 @@ export class Entity {
       id: this.id,
       position: this.position,
       size: this.size,
-      type: this.type,
+      entityType: this.entityType,
     };
   }
 
