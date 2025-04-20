@@ -59,6 +59,8 @@ export class Enemy extends Tank {
     const freeze = this.timeManager.getTimer("freeze");
     this.timeManager.decrementTimers();
 
+    this.animateSprite();
+
     if (spawn) {
       const isIntersecting = this.isSpawnSpotClear(game);
       if (isIntersecting) {
@@ -71,12 +73,10 @@ export class Enemy extends Tank {
       this.aiMove();
       this.shot(ENEMY_STATS[this.type].shotCD, game);
     }
-
-    this.animateSprite();
   }
 
   render() {
-    this.sprite(this.position, this.size);
+    this.sprite(this.position, this.spriteSize ?? this.size);
   }
 
   animateSprite() {

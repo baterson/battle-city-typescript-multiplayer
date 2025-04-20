@@ -84,6 +84,8 @@ export class Player extends Tank {
     const death = this.timeManager.getTimer("death");
     const spawn = this.timeManager.getTimer("spawn");
 
+    this.animateSprite();
+
     if (death) {
       if (death === 1) this.respawn(true);
       return;
@@ -92,11 +94,10 @@ export class Player extends Tank {
     }
     this.soundManager.play("neutral");
     this.processInput(game);
-    this.animateSprite();
   }
 
   render() {
-    this.sprite(this.position, this.size);
+    this.sprite(this.position, this.spriteSize ?? this.size);
   }
 
   animateSprite() {

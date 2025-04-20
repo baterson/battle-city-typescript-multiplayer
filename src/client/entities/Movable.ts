@@ -80,6 +80,7 @@ export class Movable extends Entity {
     this.spriteIndex = Math.floor(distance / 0.3) % sprites.length;
     this.sprite = sprites[this.spriteIndex];
     this.variableSpriteName = "";
+    this.spriteSize = undefined;
   }
 
   animateVariableSprites(
