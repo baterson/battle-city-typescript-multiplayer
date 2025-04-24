@@ -12,26 +12,32 @@ import { Keyboard } from "./Keyboard";
 export class HeadlessGame {
   isStartScreen: boolean;
   isLost: boolean;
+  isPaused: boolean;
   isStopped: boolean;
   stage: Stage;
   timeManager: TimeManager<"screenFade">;
-  ws: WebSocket;
+  loopTimerId: number;
   //   soundManager: SoundManager<"gameover">;
 
-  constructor(ws: WebSocket) {
-    this.ws = ws;
+  constructor() {
     this.isStartScreen = true;
     this.isLost = false;
+    this.isPaused = false;
+    this.isStopped = false;
     this.entityManager = new EntityManager();
     this.timeManager = new TimeManager();
     this.keyboard = new Keyboard();
     // this.soundManager = new SoundManager(["gameover"]);
   }
 
+  onUpdate() {}
+
   toJSON() {
     return {
       isStartScreen: this.isStartScreen,
       isLost: this.isLost,
+      isPaused: this.isPaused,
+      isStopped: this.isStopped,
       stage: this.stage.toJSON(),
       entities: this.entityManager.toJSON(),
     };
@@ -42,20 +48,32 @@ export class HeadlessGame {
     const frameDuration = 1000 / fps;
 
     const loop = () => {
-      if (this.isStopped) return;
-
       this.update();
-      this.ws.send(JSON.stringify({ type: "STATE", data: this.toJSON() }));
-      setTimeout(loop, frameDuration);
+      this.onUpdate();
+
+      if (this.isStopped) {
+        clearTimeout(this.loopTimerId);
+
+        return;
+      }
+
+      return setTimeout(loop, frameDuration);
     };
 
-    loop();
+    this.loopTimerId = loop();
   }
 
   update() {
     this.timeManager.decrementTimers();
     const sreenFadeLeft = this.timeManager.getTimer("screenFade");
-    if (this.isLost || this.isStartScreen || sreenFadeLeft) return;
+    if (
+      this.isLost ||
+      this.isStartScreen ||
+      this.isPaused ||
+      this.isStopped ||
+      sreenFadeLeft
+    )
+      return;
 
     this.stage.update();
     this.entityManager.update(this);
@@ -122,5 +140,13 @@ export class HeadlessGame {
 
   stopGame() {
     this.isStopped = true;
+  }
+
+  pause() {
+    this.isPaused = true;
+  }
+
+  resume() {
+    this.isPaused = false;
   }
 }

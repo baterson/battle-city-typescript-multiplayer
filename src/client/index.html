@@ -1,14 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <meta charset="utf-8" />
+    <title>🏁 Battle City</title>
     <style>
-      #root {
+      #view-root {
+        position: relative;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+      }
+
+      #lobby {
+        width: 750px;
+        height: 700px;
+        min-height: 700px;
+        position: absolute;
+        border: 1px solid black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px;
+        top: 0;
+        left: 0;
+      }
+
+      #game {
+        display: none;
+        position: relative;
+      }
+
+      #waiting {
+        display: none;
+        position: absolute;
+        width: 750px;
+        height: 700px;
+        min-height: 700px;
+        position: absolute;
+        border: 1px solid black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px;
+        top: 0;
+        left: 0;
+      }
+
+      #game-root {
         background-color: rgb(41, 36, 36);
-        /* margin: 50px; */
         image-rendering: pixelated;
         z-index: 1;
         position: absolute;
@@ -20,18 +61,239 @@
         image-rendering: pixelated;
         z-index: 0;
       }
-      #container {
-        position: relative;
+
+      button {
+        width: 200px;
+        height: 50px;
       }
     </style>
   </head>
-
   <body>
-    <script type="module" src="/startClient.ts"></script>
+    <div id="view-root">
+      <div id="lobby">
+        <h1>Battle City Multiplayer: Create or Join room</h1>
+        <div>
+          <button id="create">Create new room</button>
+          <button id="join">Join a room</button>
+        </div>
+      </div>
 
-    <div id="container">
-      <canvas id="dashboard" width="750" height="700"></canvas>
-      <canvas id="root" width="600" height="600"></canvas>
+      <div id="waiting">
+        <h1>Battle City Multiplayer</h1>
+        <div>Waiting for other player to connect...</div>
+      </div>
+
+      <div id="game">
+        <canvas id="dashboard" width="750" height="700"></canvas>
+        <canvas id="game-root" width="600" height="600"></canvas>
+      </div>
     </div>
+
+    <script type="module">
+      import sprite from "./assets/sprites.png";
+      import explode from "./assets/audio/explode.flac";
+      import hit from "./assets/audio/hit.flac";
+      import hitdmg from "./assets/audio/hitdmg.flac";
+      import neutral from "./assets/audio/neutral.flac";
+      import powerup from "./assets/audio/powerup.flac";
+      import move from "./assets/audio/move.flac";
+      import start from "./assets/audio/start.flac";
+      import gameover from "./assets/audio/gameover.flac";
+      import { assetsHolder } from "./utils/assetsHolder";
+      import { Renderer } from "./Renderer";
+
+      //   assetsHolder.runPreloader();
+      await Promise.all([
+        assetsHolder.loadSprite(sprite),
+        assetsHolder.loadAudio({
+          explode,
+          hit,
+          hitdmg,
+          neutral,
+          powerup,
+          move,
+          start,
+          gameover,
+        }),
+      ]);
+      //   assetsHolder.stopPreloader();
+
+      let ws, game;
+
+      let view = "lobby";
+
+      function setView(viewName) {
+        view = viewName;
+      }
+
+      function persistConnection({ roomId, connectionId }) {
+        localStorage.setItem("roomId", roomId);
+        localStorage.setItem("connectionId", connectionId);
+      }
+
+      function clearConnection() {
+        localStorage.removeItem("roomId");
+        localStorage.removeItem("connectionId");
+      }
+
+      function clearRoom() {
+        game?.clear();
+        ws?.close();
+        ws = null;
+        game = null;
+      }
+
+      async function bindConnection(ws) {
+        ws.onopen = () => console.log("✅ WS open");
+
+        ws.onmessage = async ({ data }) => {
+          const msg = JSON.parse(data);
+
+          switch (msg.type) {
+            case "START_GAME":
+              console.log("START_GAME", msg.data);
+
+              game = new Renderer(ws);
+              game.keyboard.listenToEvents(ws);
+              game.play();
+
+              game.fromJSON(msg.data);
+              game.createLoop();
+
+              setView("game");
+
+              return;
+
+            case "JOINED_ROOM":
+              console.log("👋 Joined", msg.data);
+              console.log("ROOM before", localStorage.getItem("roomId"));
+
+              persistConnection(msg.data);
+
+              console.log("After", localStorage.getItem("roomId"));
+
+              setView("waiting");
+
+              return;
+
+            case "PLAYER_LEFT":
+              console.log("👋 Player left");
+              setView("waiting");
+
+              game?.clear();
+              return;
+
+            case "STATE_UPDATE":
+              if (game && !msg.data?.isPaused) {
+                game.fromJSON(msg.data);
+                setView("game");
+              }
+
+              return;
+
+            case "ROOM_DESTROYED":
+              console.log("👋 Room destroyed");
+              clearConnection();
+              clearRoom();
+              setView("lobby");
+              ws.close();
+              ws = null;
+              return;
+
+            case "ERROR":
+              console.error("⚠️", msg.type, msg.data);
+              clearConnection();
+              clearRoom();
+              setView("lobby");
+              ws.close();
+              ws = null;
+              return;
+          }
+        };
+
+        ws.onclose = () => {
+          console.log("❌ WS closed");
+
+          ws = null;
+          game = null;
+          setView("lobby");
+        };
+
+        ws.onerror = (err) => {
+          console.error("WS error:", err);
+          clearConnection();
+          clearRoom();
+          setView("lobby");
+          ws.close();
+        };
+      }
+
+      async function createGame() {
+        clearConnection();
+        clearRoom();
+
+        const url = new URL("ws://localhost:8080/");
+        url.searchParams.set("action", "create");
+
+        ws = new WebSocket(url);
+        bindConnection(ws);
+      }
+
+      async function findGame() {
+        const url = new URL("ws://localhost:8080/");
+        url.searchParams.set("action", "find");
+
+        ws = new WebSocket(url);
+        bindConnection(ws);
+      }
+
+      function tryReconnect() {
+        const roomId = localStorage.getItem("roomId");
+        const connectionId = localStorage.getItem("connectionId");
+
+        if (roomId && connectionId) {
+          console.log("---Found room--");
+
+          const url = new URL("ws://localhost:8080/");
+          url.searchParams.set("action", "reconnect");
+          url.searchParams.set("roomId", roomId);
+          url.searchParams.set("connectionId", connectionId);
+          ws = new WebSocket(url);
+          bindConnection(ws);
+        }
+      }
+
+      document.getElementById("create").onclick = createGame;
+      document.getElementById("join").onclick = findGame;
+
+      setView("lobby");
+      tryReconnect();
+
+      const layoutCheck = () => {
+        const waiting = document.getElementById("waiting");
+        const game = document.getElementById("game");
+        const lobby = document.getElementById("lobby");
+
+        if (view === "lobby") {
+          lobby.style.display = "block";
+          game.style.display = "none";
+          waiting.style.display = "none";
+        } else if (view === "waiting") {
+          console.log("waiting....");
+
+          lobby.style.display = "none";
+          game.style.display = "none";
+          waiting.style.display = "block";
+        } else if (view === "game") {
+          lobby.style.display = "none";
+          game.style.display = "block";
+          waiting.style.display = "none";
+        }
+
+        return requestAnimationFrame(layoutCheck);
+      };
+
+      requestAnimationFrame(layoutCheck);
+    </script>
   </body>
 </html>

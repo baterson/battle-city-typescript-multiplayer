@@ -1,36 +1,67 @@
 import { createServer } from "http";
-import { WebSocketServer } from "ws";
-import { randomUUID } from "crypto";
+import { WebSocketServer, WebSocket } from "ws";
 import { assetsHolder } from "../client/utils/assetsHolder";
-import { startServer } from "../client/startServer";
+import { RoomManager } from "./RoomManager";
+
+const PORT = 8080;
+
+assetsHolder.loadServer();
 
 const server = createServer();
 const wss = new WebSocketServer({ noServer: true });
-const rooms: Record<string, WebSocket[]> = {};
-assetsHolder.loadServer();
+
+const roomManager = new RoomManager();
 
 server.on("upgrade", (req, socket, head) => {
+  const url = new URL(req.url ?? "", `http://${req.headers.host}`);
+  const action = url.searchParams.get("action");
+  const roomId = url.searchParams.get("roomId");
+  const connectionId = url.searchParams.get("connectionId");
+
   wss.handleUpgrade(req, socket, head, (ws) => {
-    wss.emit("connection", ws, req);
+    switch (action) {
+      case "create": {
+        const room = roomManager.createRoom();
+        room.addPlayer(ws);
+        return;
+      }
+      case "find": {
+        const waiting = roomManager.findWaitingRoom();
+        if (!waiting) {
+          ws.send(
+            JSON.stringify({ type: "ERROR", data: "No rooms available" })
+          );
+          ws.close();
+        } else {
+          waiting.addPlayer(ws);
+          waiting.startGame();
+          console.log("--Starting new game--");
+        }
+        return;
+      }
+      case "reconnect": {
+        const room = roomManager.rooms[roomId];
+        console.log("reconnect room", Object.keys(roomManager.rooms), roomId);
 
-    const game = startServer(ws);
+        if (!room || !connectionId) {
+          ws.send(JSON.stringify({ type: "ERROR", data: "Room not found" }));
+          ws.close();
+        } else {
+          room.handleReconnect(ws, connectionId);
+        }
+        return;
+      }
+    }
 
-    ws.on("message", (message) => {
-      //   console.log(JSON.parse(message));
-
-      game.keyboard.handleMessage(JSON.parse(message));
-      //   ws.emit("message", message);
-      //   wss.emit("message", message, ws);
-    });
-
-    ws.on("close", () => {
-      console.log("🔴 Client disconnected");
-      game.stopGame();
-      socket.destroy();
-    });
+    ws.send(
+      JSON.stringify({ type: "ERROR", data: `Invalid action ${action}` })
+    );
+    ws.close();
   });
 });
 
-server.listen(8080, () => {
-  console.log("WebSocket server running at ws://localhost:8080/");
+server.listen(PORT, () => {
+  console.log(
+    `WebSocket matchmaking server listening on ws://localhost:${PORT}`
+  );
 });

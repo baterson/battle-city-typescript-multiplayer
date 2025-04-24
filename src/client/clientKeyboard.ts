@@ -14,10 +14,20 @@ export class ClientKeyboard {
   }
 
   listenToEvents(ws: WebSocket) {
-    ["keydown", "keyup"].forEach((eventName) => {
-      window.addEventListener(eventName, (event: KeyboardEvent) => {
-        this.handleEvent(event, ws);
-      });
-    });
+    this.onKeyDown = (event: KeyboardEvent) => {
+      this.handleEvent(event, ws);
+    };
+    this.onKeyUp = (event: KeyboardEvent) => {
+      this.handleEvent(event, ws);
+    };
+
+    window.addEventListener("keydown", this.onKeyDown);
+
+    window.addEventListener("keyup", this.onKeyUp);
+  }
+
+  clearListeners() {
+    window.removeEventListener("keydown", this.onKeyDown);
+    window.removeEventListener("keyup", this.onKeyUp);
   }
 }

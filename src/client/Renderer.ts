@@ -6,15 +6,13 @@ import { TileMap } from "./TileMap";
 
 export class Renderer {
   isStopped: boolean;
+  isPaused: boolean;
   private state: any = null;
-  private ws: WebSocket;
   private keyboard: ClientKeyboard;
 
-  constructor(ws: WebSocket) {
-    this.ws = ws;
+  constructor() {
     this.keyboard = new ClientKeyboard();
-
-    this.keyboard.listenToEvents(ws);
+    this.state = {};
   }
 
   fromJSON(state: any) {
@@ -91,7 +89,6 @@ export class Renderer {
         }
 
         case "Enemy": {
-          console.log("type", type);
           let enemyFrames;
           if (type === 2) {
             enemyFrames = assetsHolder.sprites.enemy[type][lives][direction];
@@ -118,12 +115,21 @@ export class Renderer {
 
   createLoop() {
     const loop = () => {
-      if (this.isStopped) return;
+      if (this.state && !this.state?.isPaused) {
+        this.render();
+      } else if (this.state?.isStopped) {
+        this.clear();
+        return;
+      }
 
-      this.render();
-      requestAnimationFrame(loop);
+      this.refId = requestAnimationFrame(loop);
     };
     loop();
+  }
+
+  clear() {
+    cancelAnimationFrame(this.refId);
+    this.keyboard.clearListeners();
   }
 
   play() {

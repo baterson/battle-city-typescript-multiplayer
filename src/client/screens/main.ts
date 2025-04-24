@@ -4,7 +4,7 @@ import { assetsHolder } from "../utils";
 
 const initMain = () => {
   if (typeof document !== "undefined") {
-    const canvas = <HTMLCanvasElement>document.getElementById("root");
+    const canvas = <HTMLCanvasElement>document.getElementById("game-root");
     const context = canvas.getContext("2d");
     context.font = "30px Arial";
     context.textAlign = "center";

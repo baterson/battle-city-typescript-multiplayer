@@ -5,7 +5,7 @@
   "main": "index.js",
   "homepage": "https://baterson.github.io/battle-city-typescript",
   "scripts": {
-    "dev:client": "vite",
+    "dev:client": "vite --host",
     "build:client": "vite build",
     "preview:client": "vite preview",
     "dev:server": "tsx watch src/server/index.ts",
