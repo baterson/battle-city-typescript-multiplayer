@@ -18,14 +18,9 @@ class Room {
     this.roomId = randomUUID();
     this.connections = [];
     this.game = null;
-    this.isDestroyed = false;
   }
 
-  onCleanup(roomId: string) {}
-
   addPlayer(ws) {
-    console.log("--Adding player is destroy: ", this.isDestroyed);
-
     if (this.connections.length >= 2) {
       ws.send(JSON.stringify({ type: "ERROR", data: "Room full" }));
       ws.close();
@@ -57,10 +52,6 @@ class Room {
     const conn = this.connections.find((c) => c.connectionId === connectionId);
     if (!conn) return;
 
-    conn?.ws?.removeAllListeners("message");
-    conn?.ws?.removeAllListeners("close");
-    conn?.ws?.removeAllListeners("error");
-
     conn.ws = null;
 
     this.broadcast({ type: "PLAYER_LEFT" });
@@ -83,14 +74,6 @@ class Room {
   }
 
   handleReconnect(ws: WebSocket, connectionId: string) {
-    if (this.isDestroyed) {
-      ws.send(
-        JSON.stringify({ type: "ERROR", data: "Room has been isDestroyed" })
-      );
-      ws.close();
-      return;
-    }
-
     const conn = this.connections.find((c) => c.connectionId === connectionId);
 
     if (!conn) {
@@ -133,12 +116,8 @@ class Room {
   }) {
     if (!ws) return;
 
-    ws.removeAllListeners("message");
-    ws.removeAllListeners("close");
-    ws.removeAllListeners("error");
-
     ws.on("message", (msg) => {
-      if (!this.game || this.isDestroyed) return;
+      if (!this.game) return;
 
       this.game.keyboard.handleMessage(JSON.parse(msg.toString()));
     });

@@ -122,6 +122,30 @@
 
       let view = "lobby";
 
+      const layoutCheck = () => {
+        const waiting = document.getElementById("waiting");
+        const game = document.getElementById("game");
+        const lobby = document.getElementById("lobby");
+
+        if (view === "lobby") {
+          lobby.style.display = "block";
+          game.style.display = "none";
+          waiting.style.display = "none";
+        } else if (view === "waiting") {
+          console.log("waiting....");
+
+          lobby.style.display = "none";
+          game.style.display = "none";
+          waiting.style.display = "block";
+        } else if (view === "game") {
+          lobby.style.display = "none";
+          game.style.display = "block";
+          waiting.style.display = "none";
+        }
+
+        return requestAnimationFrame(layoutCheck);
+      };
+
       function setView(viewName) {
         view = viewName;
       }
@@ -266,33 +290,7 @@
       document.getElementById("create").onclick = createGame;
       document.getElementById("join").onclick = findGame;
 
-      setView("lobby");
       tryReconnect();
-
-      const layoutCheck = () => {
-        const waiting = document.getElementById("waiting");
-        const game = document.getElementById("game");
-        const lobby = document.getElementById("lobby");
-
-        if (view === "lobby") {
-          lobby.style.display = "block";
-          game.style.display = "none";
-          waiting.style.display = "none";
-        } else if (view === "waiting") {
-          console.log("waiting....");
-
-          lobby.style.display = "none";
-          game.style.display = "none";
-          waiting.style.display = "block";
-        } else if (view === "game") {
-          lobby.style.display = "none";
-          game.style.display = "block";
-          waiting.style.display = "none";
-        }
-
-        return requestAnimationFrame(layoutCheck);
-      };
-
       requestAnimationFrame(layoutCheck);
     </script>
   </body>
