@@ -48,9 +48,28 @@ class Room {
     }
   }
 
+  destroyRoom() {
+    this.game?.gameOver();
+    this.game?.stopGame();
+    this.broadcast({ type: "ROOM_DESTROYED" });
+    this.onCleanup(this.roomId);
+
+    console.log("---Cleanup Room---", this.roomId);
+
+    this.isDestroyed = true;
+    this.connections = [];
+    this.game = null;
+  }
+
   handleDisconnect(connectionId: string) {
     const conn = this.connections.find((c) => c.connectionId === connectionId);
     if (!conn) return;
+
+    if (this.connections.length === 1) {
+      // Disconnect in create
+      this.destroyRoom();
+      return;
+    }
 
     conn.ws = null;
 
@@ -59,18 +78,10 @@ class Room {
 
     if (conn.disconnectTimer) clearTimeout(conn.disconnectTimer);
 
-    conn.disconnectTimer = setTimeout(() => {
-      this.game?.gameOver();
-      this.game?.stopGame();
-      this.broadcast({ type: "ROOM_DESTROYED" });
-      this.onCleanup(this.roomId);
-
-      console.log("---Cleanup Room---", this.roomId);
-
-      this.isDestroyed = true;
-      this.connections = [];
-      this.game = null;
-    }, DISCONNECT_TIMEOUT);
+    conn.disconnectTimer = setTimeout(
+      () => this.destroyRoom(),
+      DISCONNECT_TIMEOUT
+    );
   }
 
   handleReconnect(ws: WebSocket, connectionId: string) {

@@ -6,8 +6,8 @@
     <style>
       #view-root {
         position: relative;
-        height: 100vh;
-        width: 100vw;
+        width: 800px;
+        height: 800px;
         overflow: hidden;
       }
 
@@ -256,7 +256,7 @@
         clearConnection();
         clearRoom();
 
-        const url = new URL("ws://localhost:8080/");
+        const url = new URL(`ws://${location.hostname}:8080/`);
         url.searchParams.set("action", "create");
 
         ws = new WebSocket(url);
@@ -264,7 +264,7 @@
       }
 
       async function findGame() {
-        const url = new URL("ws://localhost:8080/");
+        const url = new URL(`ws://${location.hostname}:8080/`);
         url.searchParams.set("action", "find");
 
         ws = new WebSocket(url);
@@ -278,7 +278,7 @@
         if (roomId && connectionId) {
           console.log("---Found room--");
 
-          const url = new URL("ws://localhost:8080/");
+          const url = new URL(`ws://${location.hostname}:8080/`);
           url.searchParams.set("action", "reconnect");
           url.searchParams.set("roomId", roomId);
           url.searchParams.set("connectionId", connectionId);
