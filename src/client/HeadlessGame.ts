@@ -14,17 +14,15 @@ export class HeadlessGame {
   isStartScreen: boolean;
   isLost: boolean;
   isPaused: boolean;
-  isStopped: boolean;
   stage: Stage;
   timeManager: TimeManager<"screenFade">;
   loopTimerId: number;
   //   soundManager: SoundManager<"gameover">;
 
   constructor() {
-    this.isStartScreen = true;
+    this.isStartScreen = false;
     this.isLost = false;
     this.isPaused = false;
-    this.isStopped = false;
     this.entityManager = new EntityManager();
     this.timeManager = new TimeManager();
     this.keyboard = new Keyboard();
@@ -35,10 +33,10 @@ export class HeadlessGame {
 
   toJSON() {
     return {
-      isStartScreen: this.isStartScreen,
+      screenFadeLeft: this.timeManager.getTimer("screenFade"),
+      gameOverFadeLeft: this.timeManager.getTimer("gameover"),
       isLost: this.isLost,
       isPaused: this.isPaused,
-      isStopped: this.isStopped,
       stage: this.stage.toJSON(),
       entities: this.entityManager.toJSON(),
     };
@@ -52,7 +50,8 @@ export class HeadlessGame {
       this.update();
       this.onUpdate();
 
-      if (this.isStopped) {
+      if (this.isLost) {
+        this.onGameOver();
         clearTimeout(this.loopTimerId);
 
         return;
@@ -67,13 +66,7 @@ export class HeadlessGame {
   update() {
     this.timeManager.decrementTimers();
     const sreenFadeLeft = this.timeManager.getTimer("screenFade");
-    if (
-      this.isLost ||
-      this.isStartScreen ||
-      this.isPaused ||
-      this.isStopped ||
-      sreenFadeLeft
-    )
+    if (this.isLost || this.isStartScreen || this.isPaused || sreenFadeLeft)
       return;
 
     this.stage.update();
@@ -124,7 +117,8 @@ export class HeadlessGame {
     this.stage = new Stage(
       stageNum,
       new TileMap(maps[stageNum]),
-      tanksConfig[stageNum]
+      tanksConfig[stageNum],
+      this
     );
 
     player.respawn();
@@ -132,7 +126,6 @@ export class HeadlessGame {
   }
 
   play() {
-    this.isStartScreen = false;
     this.entityManager.spawnEntity("Player", PLAYER_SPAWN_POSITION);
     this.entityManager.spawnEntity(
       "SecondPlayer",
@@ -146,10 +139,6 @@ export class HeadlessGame {
     this.isLost = false;
     this.entityManager.clear();
     this.play();
-  }
-
-  stopGame() {
-    this.isStopped = true;
   }
 
   pause() {

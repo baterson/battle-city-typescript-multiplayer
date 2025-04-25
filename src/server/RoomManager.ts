@@ -53,7 +53,6 @@ class Room {
 
   destroyRoom() {
     this.game?.gameOver();
-    this.game?.stopGame();
     this.broadcast({ type: "ROOM_DESTROYED" });
     this.onCleanup(this.roomId);
 
@@ -151,9 +150,12 @@ class Room {
     this.game = new HeadlessGame();
 
     this.game.onUpdate = () => {
-      if (this.game && !this.game.isStopped) {
+      if (this.game) {
         this.broadcast({ type: "STATE_UPDATE", data: this.game.toJSON() });
       }
+    };
+    this.game.onGameOver = () => {
+      this.destroyRoom();
     };
 
     this.connections.forEach((c) => this.bindConnection(c));

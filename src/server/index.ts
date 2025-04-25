@@ -46,6 +46,9 @@ server.on("upgrade", (req, socket, head) => {
         if (!room || !connectionId) {
           ws.send(JSON.stringify({ type: "ERROR", data: "Room not found" }));
           ws.close();
+        } else if (room?.game?.isLost) {
+          ws.send(JSON.stringify({ type: "ERROR", data: "Game is lost" }));
+          ws.close();
         } else {
           room.handleReconnect(ws, connectionId);
         }

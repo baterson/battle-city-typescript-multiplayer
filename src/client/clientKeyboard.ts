@@ -2,6 +2,8 @@ import { ControlKeys } from "./types";
 
 export class ClientKeyboard {
   handleEvent(event: KeyboardEvent, ws: WebSocket) {
+    if (ws.readyState !== 1) return;
+
     const { code, type } = event;
 
     if (!ControlKeys[code]) return;
