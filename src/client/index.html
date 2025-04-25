@@ -118,7 +118,7 @@
       ]);
       //   assetsHolder.stopPreloader();
 
-      let ws, game;
+      let ws, game, playerType;
 
       let view = "lobby";
 
@@ -150,7 +150,7 @@
         view = viewName;
       }
 
-      function persistConnection({ roomId, connectionId }) {
+      function persistConnection({ roomId, connectionId, playerType }) {
         localStorage.setItem("roomId", roomId);
         localStorage.setItem("connectionId", connectionId);
       }
@@ -163,6 +163,7 @@
       function clearRoom() {
         game?.clear();
         ws?.close();
+        playerType = null;
         ws = null;
         game = null;
       }
@@ -175,10 +176,8 @@
 
           switch (msg.type) {
             case "START_GAME":
-              console.log("START_GAME", msg.data);
-
               game = new Renderer(ws);
-              game.keyboard.listenToEvents(ws);
+              game.keyboard.listenToEvents(ws, playerType);
               game.play();
 
               game.fromJSON(msg.data);
@@ -190,11 +189,9 @@
 
             case "JOINED_ROOM":
               console.log("👋 Joined", msg.data);
-              console.log("ROOM before", localStorage.getItem("roomId"));
+              playerType = msg.data.playerType;
 
               persistConnection(msg.data);
-
-              console.log("After", localStorage.getItem("roomId"));
 
               setView("waiting");
 

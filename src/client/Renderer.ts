@@ -76,6 +76,13 @@ export class Renderer {
           break;
         }
 
+        case "SecondPlayer": {
+          const frames = assetsHolder.sprites.player[power][direction];
+          const draw = frames[spriteIndex];
+          draw(position, size);
+          break;
+        }
+
         case "Bullet": {
           const frames = assetsHolder.sprites.bullet[direction];
           const draw = frames[spriteIndex];

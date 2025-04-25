@@ -1,5 +1,5 @@
 import * as entities from "../entities";
-import { Enemy, Player, Flag, Movable } from "../entities";
+import { Enemy, Player, SecondPlayer, Flag, Movable } from "../entities";
 import { Entities, Direction, TankTypes, PowerupTypes, Vector } from "../types";
 import { checkEntityCollision } from "../utils";
 import { TileMap, rigid } from "../TileMap";
@@ -9,6 +9,7 @@ import {
   isTank,
   isFlag,
   isPowerup,
+  isSecondPlayer,
 } from "../entities/guards";
 import { TILE_SIDE } from "../constants";
 import type { HeadlessGame } from "../HeadlessGame";
@@ -70,6 +71,10 @@ export class EntityManager {
 
   getPlayer(): Player {
     return this.entities.find(isPlayer);
+  }
+
+  getSecondPlayer(): SecondPlayer {
+    return this.entities.find(isSecondPlayer);
   }
 
   getFlag(): Flag {

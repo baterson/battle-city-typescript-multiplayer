@@ -22,7 +22,7 @@ server.on("upgrade", (req, socket, head) => {
     switch (action) {
       case "create": {
         const room = roomManager.createRoom();
-        room.addPlayer(ws);
+        room.addPlayer(ws, "Player");
         return;
       }
       case "find": {
@@ -33,7 +33,7 @@ server.on("upgrade", (req, socket, head) => {
           );
           ws.close();
         } else {
-          waiting.addPlayer(ws);
+          waiting.addPlayer(ws, "SecondPlayer");
           waiting.startGame();
           console.log("--Starting new game--");
         }

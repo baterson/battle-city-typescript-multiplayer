@@ -8,14 +8,14 @@ export const TANK_SIZE = { x: 40, y: 40 };
 export const FLAG_SIZE = { x: 40, y: 40 };
 export const FLAG_POSITION = { x: 280, y: 560 };
 export const PLAYER_SPAWN_POSITION = { x: 210, y: 560 };
-export const SECOND_PLAYER_SPAWN_POSITION = { x: 260, y: 560 };
+export const SECOND_PLAYER_SPAWN_POSITION = { x: 345, y: 560 };
 export const BULLET_SIZE = { x: 10, y: 10 };
 export const BULLET_VELOCITY = 300;
 export const POWERUP_SIZE = { x: 40, y: 40 };
 export const PLAYER_STATS = {
   [types.PlayerPower.Default]: {
     velocity: 100,
-    shotCD: 50,
+    shotCD: 30,
   },
   [types.PlayerPower.First]: {
     velocity: 120,

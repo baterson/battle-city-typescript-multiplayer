@@ -35,8 +35,8 @@ function powerupObserver(this: Player, powerupType: PowerupTypes) {
   }
 }
 
-export class Player extends Tank {
-  entityType = "Player";
+export class SecondPlayer extends Tank {
+  entityType = "SecondPlayer";
   lives: number;
   // Upgrades from power-ups
   power: PlayerPower;
@@ -135,7 +135,7 @@ export class Player extends Tank {
 
   processInput(game: HeadlessGame) {
     const key = game.keyboard.getKey(this.entityType);
-    // console.log("Player key", key);
+    // console.log("SecondPlayer", key);
 
     let isMoving = true;
 

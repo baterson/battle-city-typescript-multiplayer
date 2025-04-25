@@ -5,3 +5,4 @@ export * from "./Flag";
 export * from "./Powerup";
 export * from "./Tank";
 export * from "./Movable";
+export * from "./SecondPlayer";

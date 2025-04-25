@@ -3,6 +3,7 @@ import {
   DELTA_TIME,
   PLAYER_SPAWN_POSITION,
   SCREEN_FADE_FRAMES,
+  SECOND_PLAYER_SPAWN_POSITION,
 } from "./constants";
 import { TileMap } from "./TileMap";
 import { Stage } from "./Stage";
@@ -81,10 +82,11 @@ export class HeadlessGame {
     this.entityManager.removeFromQueue();
 
     const player = this.entityManager.getPlayer();
+    const secondPlayer = this.entityManager.getSecondPlayer();
 
     const flag = this.entityManager.getFlag();
 
-    if (!player || flag.isDestroyed) {
+    if (!player || !secondPlayer || flag.isDestroyed) {
       this.entityManager.clear();
       return this.gameOver();
     }
@@ -117,17 +119,25 @@ export class HeadlessGame {
     this.entityManager.clear(false);
     const stageNum = this.getNextStageNum();
     const player: any = this.entityManager.getPlayer();
+    const secondPlayer: any = this.entityManager.getSecondPlayer();
+
     this.stage = new Stage(
       stageNum,
       new TileMap(maps[stageNum]),
       tanksConfig[stageNum]
     );
+
     player.respawn();
+    secondPlayer.respawn();
   }
 
   play() {
     this.isStartScreen = false;
     this.entityManager.spawnEntity("Player", PLAYER_SPAWN_POSITION);
+    this.entityManager.spawnEntity(
+      "SecondPlayer",
+      SECOND_PLAYER_SPAWN_POSITION
+    );
     this.timeManager.setTimer("screenFade", SCREEN_FADE_FRAMES);
     this.stage = new Stage(0, new TileMap(maps[0]), tanksConfig[0], this);
   }

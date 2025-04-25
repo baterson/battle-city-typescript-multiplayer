@@ -1,26 +1,30 @@
-import { Entities } from '../types';
-import { Player, Enemy, Powerup, Flag, Tank, Bullet } from './';
+import { Entities } from "../types";
+import { Player, SecondPlayer, Enemy, Powerup, Flag, Tank, Bullet } from "./";
 
 export function isTank(entity: Entities): entity is Tank {
-	return entity instanceof Tank;
+  return entity instanceof Tank;
 }
 
 export function isPlayer(entity: Entities): entity is Player {
-	return entity instanceof Player;
+  return entity instanceof Player;
+}
+
+export function isSecondPlayer(entity: Entities): entity is SecondPlayer {
+  return entity instanceof SecondPlayer;
 }
 
 export function isEnemy(entity: Entities): entity is Enemy {
-	return entity instanceof Enemy;
+  return entity instanceof Enemy;
 }
 
 export function isBullet(entity: Entities): entity is Bullet {
-	return entity instanceof Bullet;
+  return entity instanceof Bullet;
 }
 
 export function isFlag(entity: Entities): entity is Flag {
-	return entity instanceof Flag;
+  return entity instanceof Flag;
 }
 
 export function isPowerup(entity: Entities): entity is Powerup {
-	return entity instanceof Powerup;
+  return entity instanceof Powerup;
 }

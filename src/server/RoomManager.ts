@@ -7,7 +7,10 @@ type Connection = {
   ws: WebSocket | null;
   connectionId: string;
   disconnectTimer?: number;
+  playerType: playerType;
 };
+
+type playerType = "Player" | "SecondPlayer";
 
 class Room {
   roomId: string;
@@ -20,7 +23,7 @@ class Room {
     this.game = null;
   }
 
-  addPlayer(ws) {
+  addPlayer(ws, playerType) {
     if (this.connections.length >= 2) {
       ws.send(JSON.stringify({ type: "ERROR", data: "Room full" }));
       ws.close();
@@ -28,14 +31,14 @@ class Room {
     }
 
     const connectionId = randomUUID();
-    const conn = { ws, connectionId };
+    const conn = { ws, connectionId, playerType };
     this.connections.push(conn);
     this.bindConnection(conn);
 
     ws.send(
       JSON.stringify({
         type: "JOINED_ROOM",
-        data: { roomId: this.roomId, connectionId },
+        data: { roomId: this.roomId, connectionId, playerType },
       })
     );
   }
@@ -129,8 +132,9 @@ class Room {
 
     ws.on("message", (msg) => {
       if (!this.game) return;
+      console.log("msg", JSON.parse(msg));
 
-      this.game.keyboard.handleMessage(JSON.parse(msg.toString()));
+      this.game.keyboard.handleMessage(JSON.parse(msg));
     });
 
     ws.on("close", () => {

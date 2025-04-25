@@ -7,13 +7,29 @@ export class ClientKeyboard {
     if (!ControlKeys[code]) return;
 
     if (type === "keydown") {
-      ws.send(JSON.stringify({ type: "KEYDOWN", key: code }));
+      console.log("this.playerType", this.playerType);
+
+      ws.send(
+        JSON.stringify({
+          type: "KEYDOWN",
+          key: code,
+          playerType: this.playerType,
+        })
+      );
     } else {
-      ws.send(JSON.stringify({ type: "KEYUP", key: code }));
+      ws.send(
+        JSON.stringify({
+          type: "KEYUP",
+          key: code,
+          playerType: this.playerType,
+        })
+      );
     }
   }
 
-  listenToEvents(ws: WebSocket) {
+  listenToEvents(ws: WebSocket, playerType: string) {
+    this.playerType = playerType;
+
     this.onKeyDown = (event: KeyboardEvent) => {
       this.handleEvent(event, ws);
     };
@@ -27,6 +43,8 @@ export class ClientKeyboard {
   }
 
   clearListeners() {
+    this.playerType = null;
+
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("keyup", this.onKeyUp);
   }
