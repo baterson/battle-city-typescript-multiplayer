@@ -35,6 +35,8 @@ function powerupObserver(this: Player, powerupType: PowerupTypes) {
   }
 }
 
+// TODO: remove collisions for player
+// TODO: add collisions to powerup and tanks
 export class SecondPlayer extends Tank {
   entityType = "SecondPlayer";
   lives: number;

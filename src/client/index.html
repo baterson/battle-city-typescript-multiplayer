@@ -151,13 +151,13 @@
       }
 
       function persistConnection({ roomId, connectionId, playerType }) {
-        localStorage.setItem("roomId", roomId);
-        localStorage.setItem("connectionId", connectionId);
+        sessionStorage.setItem("roomId", roomId);
+        sessionStorage.setItem("connectionId", connectionId);
       }
 
       function clearConnection() {
-        localStorage.removeItem("roomId");
-        localStorage.removeItem("connectionId");
+        sessionStorage.removeItem("roomId");
+        sessionStorage.removeItem("connectionId");
       }
 
       function clearRoom() {
@@ -269,8 +269,8 @@
       }
 
       function tryReconnect() {
-        const roomId = localStorage.getItem("roomId");
-        const connectionId = localStorage.getItem("connectionId");
+        const roomId = sessionStorage.getItem("roomId");
+        const connectionId = sessionStorage.getItem("connectionId");
 
         if (roomId && connectionId) {
           console.log("---Found room--");
