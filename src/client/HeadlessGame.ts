@@ -81,7 +81,7 @@ export class HeadlessGame {
     this.entityManager.checkCollisions(this.stage.map);
     this.entityManager.removeFromQueue();
 
-    const player = this.entityManager.getPlayer();
+    const player = this.entityManager.getFirstPlayer();
     const secondPlayer = this.entityManager.getSecondPlayer();
 
     const flag = this.entityManager.getFlag();
@@ -118,7 +118,7 @@ export class HeadlessGame {
     this.timeManager.setTimer("screenFade", SCREEN_FADE_FRAMES);
     this.entityManager.clear(false);
     const stageNum = this.getNextStageNum();
-    const player: any = this.entityManager.getPlayer();
+    const player: any = this.entityManager.getFirstPlayer();
     const secondPlayer: any = this.entityManager.getSecondPlayer();
 
     this.stage = new Stage(

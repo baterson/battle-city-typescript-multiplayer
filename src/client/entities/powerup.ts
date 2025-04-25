@@ -24,9 +24,9 @@ export class PowerupEvents {
     delete this.observers[entityId];
   }
 
-  notify(eventType: PowerupTypes) {
+  notify(eventType: PowerupTypes, entityManager, triggeredBy) {
     Object.values(this.observers).forEach((observer: any): any =>
-      observer(eventType)
+      observer(eventType, entityManager, triggeredBy)
     );
   }
 }
@@ -74,7 +74,7 @@ export class Powerup extends Entity {
   resolveEntityCollision(other, entityManager) {
     if (isPlayer(other)) {
       entityManager.toRemove(this.id);
-      powerupEvents.notify(this.type);
+      powerupEvents.notify(this.type, entityManager, other);
       this.soundManager.play("powerup");
     }
   }

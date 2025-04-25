@@ -18,11 +18,21 @@ import {
   INVINCIBLE_FRAMES,
 } from "../constants";
 import { powerupEvents } from "./Powerup";
-import { SoundManager, TimeManager } from "../managers";
-import { isPowerup, isBullet } from "./guards";
+import { EntityManager, SoundManager, TimeManager } from "../managers";
+import { isPowerup, isBullet, isPlayer, isFirstPlayer } from "./guards";
 import type { HeadlessGame } from "../HeadlessGame";
+import type { Player } from "./Player";
 
-function powerupObserver(this: Player, powerupType: PowerupTypes) {
+function powerupObserver(
+  this: SecondPlayer,
+  powerupType: PowerupTypes,
+  entityManager: EntityManager,
+  triggeredBy: Player | SecondPlayer
+) {
+  if (isFirstPlayer(triggeredBy)) {
+    return;
+  }
+
   if (powerupType === PowerupTypes.Tank) {
     this.lives += 1;
   } else if (powerupType === PowerupTypes.Helmet) {
@@ -35,8 +45,6 @@ function powerupObserver(this: Player, powerupType: PowerupTypes) {
   }
 }
 
-// TODO: remove collisions for player
-// TODO: add collisions to powerup and tanks
 export class SecondPlayer extends Tank {
   entityType = "SecondPlayer";
   lives: number;
@@ -182,7 +190,7 @@ export class SecondPlayer extends Tank {
   resolveEntityCollision(other: Entities, entityManager) {
     const death = this.timeManager.getTimer("death");
 
-    if (isPowerup(other)) {
+    if (isPowerup(other) || isPlayer(other)) {
       return;
     } else if (isBullet(other) && !death) {
       const invincible = this.timeManager.getTimer("invincible");

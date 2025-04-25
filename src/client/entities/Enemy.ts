@@ -13,11 +13,11 @@ import { powerupEvents } from "./Powerup";
 import { isPlayer, isEnemy, isBullet, isPowerup } from "./guards";
 import { HeadlessGame } from "../HeadlessGame";
 
-function powerupObserver(this: Enemy, powerupType) {
+function powerupObserver(this: Enemy, powerupType, entityManager) {
   if (powerupType === PowerupTypes.Stopwatch) {
     this.timeManager.setTimer("freeze", FREEZE_FRAMES);
   } else if (powerupType === PowerupTypes.Grenade) {
-    if (!this.timeManager.some(["death", "spawn"])) this.die();
+    if (!this.timeManager.some(["death", "spawn"])) this.die(entityManager);
   }
 }
 

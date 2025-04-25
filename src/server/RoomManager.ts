@@ -132,8 +132,6 @@ class Room {
 
     ws.on("message", (msg) => {
       if (!this.game) return;
-      console.log("msg", JSON.parse(msg));
-
       this.game.keyboard.handleMessage(JSON.parse(msg));
     });
 

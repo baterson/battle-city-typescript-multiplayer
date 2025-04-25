@@ -11,13 +11,10 @@ export class Keyboard {
 
   handleMessage(message: any) {
     const { type, key, playerType } = message;
-    console.log("handleMessage", type, key, playerType);
 
     let q = playerType === "Player" ? this.queue : this.secondQueue;
 
     if (type === "KEYDOWN") {
-      console.log("Adding key, ", message);
-
       q.add(key);
     } else if (type === "KEYUP") {
       q.delete(key);

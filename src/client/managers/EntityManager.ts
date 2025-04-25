@@ -10,6 +10,7 @@ import {
   isFlag,
   isPowerup,
   isSecondPlayer,
+  isFirstPlayer,
 } from "../entities/guards";
 import { TILE_SIDE } from "../constants";
 import type { HeadlessGame } from "../HeadlessGame";
@@ -69,8 +70,8 @@ export class EntityManager {
     return this.entities.filter(isEnemy);
   }
 
-  getPlayer(): Player {
-    return this.entities.find(isPlayer);
+  getFirstPlayer(): Player {
+    return this.entities.find(isFirstPlayer);
   }
 
   getSecondPlayer(): SecondPlayer {
@@ -145,11 +146,16 @@ export class EntityManager {
 	*/
   clear(clearPlayer = true) {
     if (!clearPlayer) {
-      const player = this.getPlayer();
+      const player = this.getFirstPlayer();
       Object.values(this.pool)
         .filter((entity) => entity.id !== player.id)
         .forEach((entity) => entity.deconstruct());
-      this.pool = { [player.id]: player };
+
+      const secondPlayer = this.getSecondPlayer();
+      Object.values(this.pool)
+        .filter((entity) => entity.id !== secondPlayer.id)
+        .forEach((entity) => entity.deconstruct());
+      this.pool = { [player.id]: player, [secondPlayer.id]: secondPlayer };
     } else {
       Object.values(this.pool).forEach((entity) => entity.deconstruct());
       this.pool = {};

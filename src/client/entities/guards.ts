@@ -5,12 +5,16 @@ export function isTank(entity: Entities): entity is Tank {
   return entity instanceof Tank;
 }
 
-export function isPlayer(entity: Entities): entity is Player {
+export function isFirstPlayer(entity: Entities): entity is Player {
   return entity instanceof Player;
 }
 
 export function isSecondPlayer(entity: Entities): entity is SecondPlayer {
   return entity instanceof SecondPlayer;
+}
+
+export function isPlayer(entity: Entities): entity is Player | SecondPlayer {
+  return isFirstPlayer(entity) || isSecondPlayer(entity);
 }
 
 export function isEnemy(entity: Entities): entity is Enemy {
