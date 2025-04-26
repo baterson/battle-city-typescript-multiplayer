@@ -19,7 +19,7 @@ import {
   SECOND_PLAYER_SPAWN_POSITION,
 } from "../constants";
 import { powerupEvents } from "./Powerup";
-import { EntityManager, SoundManager, TimeManager } from "../managers";
+import { EntityManager, TimeManager } from "../managers";
 import { isPowerup, isBullet, isPlayer, isFirstPlayer } from "./guards";
 import type { HeadlessGame } from "../HeadlessGame";
 import type { Player } from "./Player";
@@ -52,24 +52,12 @@ export class SecondPlayer extends Tank {
   // Upgrades from power-ups
   power: PlayerPower;
   timeManager: TimeManager<"spawn" | "death" | "invincible" | "shotCD">;
-  soundManager: SoundManager<"explode" | "neutral" | "move">;
 
   constructor(spawnPosition: Vector = SECOND_PLAYER_SPAWN_POSITION) {
     super({ ...spawnPosition }, { ...TANK_SIZE }, Direction.Top);
     this.lives = 3;
     this.power = PlayerPower.Default;
     this.timeManager = new TimeManager();
-    this.soundManager = new SoundManager([
-      "explode",
-      {
-        trackName: "neutral",
-        loop: true,
-      },
-      {
-        trackName: "move",
-        loop: true,
-      },
-    ]);
 
     this.timeManager.setTimer("spawn", SPAWN_FRAMES);
     this.timeManager.setTimer("invincible", INVINCIBLE_FRAMES);
@@ -103,7 +91,7 @@ export class SecondPlayer extends Tank {
     } else if (spawn) {
       return;
     }
-    this.soundManager.play("neutral");
+    game.playSound("neutral");
     this.processInput(game);
   }
 
@@ -157,7 +145,7 @@ export class SecondPlayer extends Tank {
     } else if (key === ControlKeys.ArrowRight) {
       this.direction = Direction.Right;
     } else {
-      this.soundManager.pause("move");
+      game.pauseSound("move");
       isMoving = false;
     }
 
@@ -166,8 +154,8 @@ export class SecondPlayer extends Tank {
     }
 
     if (isMoving) {
-      this.soundManager.pause("neutral");
-      this.soundManager.play("move");
+      game.pauseSound("neutral");
+      game.playSound("move");
       this.move(PLAYER_STATS[this.power].velocity);
     }
   }
@@ -196,7 +184,7 @@ export class SecondPlayer extends Tank {
       if (invincible) return;
 
       this.timeManager.setTimer("death", DEATH_FRAMES);
-      this.soundManager.play("explode");
+      entityManager.game.playSound("explode");
       this.lives -= 1;
       if (this.lives === 0) {
         this.die(entityManager);
@@ -208,7 +196,6 @@ export class SecondPlayer extends Tank {
 
   respawn(defaultPower = false) {
     if (defaultPower) this.power = PlayerPower.Default;
-    this.soundManager.pauseAll();
     this.timeManager.setTimer("spawn", SPAWN_FRAMES);
     this.timeManager.setTimer("invincible", INVINCIBLE_FRAMES);
     this.position = { ...SECOND_PLAYER_SPAWN_POSITION };
@@ -216,7 +203,6 @@ export class SecondPlayer extends Tank {
   }
 
   deconstruct() {
-    this.soundManager.pauseAll();
     powerupEvents.unsubscribe(this.id);
   }
 }

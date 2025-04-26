@@ -4,7 +4,7 @@ import {
   ENEMY_SPAWN_CD,
   ENEMY_SPAWN_POSITION,
 } from "./constants";
-import { TimeManager, SoundManager } from "./managers";
+import { TimeManager } from "./managers";
 import { randomInt } from "./utils";
 import { TileMap } from "./TileMap";
 import type { HeadlessGame } from "./HeadlessGame";
@@ -18,7 +18,6 @@ export class Stage {
   tanks: number[];
   powerupsAvailable: number;
   timeManager: TimeManager<"enemySpawnCD" | "powerupSpawnCD">;
-  soundManager: SoundManager<"start">;
 
   constructor(
     number: number,
@@ -31,13 +30,12 @@ export class Stage {
     this.tanks = [...tanks];
     this.powerupsAvailable = 5;
     this.timeManager = new TimeManager();
-    this.soundManager = new SoundManager(["start"]);
 
     this.timeManager.setTimer("powerupSpawnCD", POWERUP_SPAWN_CD);
-    this.soundManager.play("start");
 
     this.game = game;
     this.game.entityManager.spawnEntity("Flag");
+    this.game.playSound("start");
   }
 
   toJSON() {

@@ -100,6 +100,7 @@
       import start from "./assets/audio/start.flac";
       import gameover from "./assets/audio/gameover.flac";
       import { assetsHolder } from "./utils/assetsHolder";
+      import { SoundManager } from "./managers/SoundManager";
       import { Renderer } from "./Renderer";
 
       // assetsHolder.runPreloader();
@@ -117,6 +118,22 @@
         }),
       ]);
       //   assetsHolder.stopPreloader();
+      const soundManager = new SoundManager([
+        "explode",
+        "hit",
+        "hitdmg",
+        "powerup",
+        {
+          trackName: "neutral",
+          loop: true,
+        },
+        {
+          trackName: "move",
+          loop: true,
+        },
+        "start",
+        "gameover",
+      ]);
 
       let ws, game, playerType;
 
@@ -207,6 +224,9 @@
             case "STATE_UPDATE":
               if (game && !msg.data?.isPaused) {
                 game.fromJSON(msg.data);
+                // console.log("sound", soundManager.tracks);
+
+                soundManager.checkSounds(msg.data.sounds);
                 setView("game");
               }
 

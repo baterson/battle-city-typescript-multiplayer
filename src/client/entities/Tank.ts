@@ -1,6 +1,6 @@
 import { Movable } from "./Movable";
 import { BULLET_SIZE, DEATH_FRAMES, TILE_SIDE } from "../constants";
-import { TimeManager, SoundManager } from "../managers";
+import { TimeManager } from "../managers";
 import { Direction, Vector, Tile } from "../types";
 import type { HeadlessGame } from "../HeadlessGame";
 
@@ -9,7 +9,6 @@ Base class for all tanks (Player/Enemy)
 */
 export class Tank extends Movable {
   public timeManager: TimeManager<"spawn" | "death" | "shotCD">;
-  public soundManager: SoundManager<"explode">;
 
   constructor(position: Vector, size: Vector, direction: Direction) {
     super(position, size, direction);
@@ -56,7 +55,7 @@ export class Tank extends Movable {
 
   die(entityManager) {
     this.timeManager.setTimer("death", DEATH_FRAMES);
-    this.soundManager.play("explode");
+    entityManager.game.playSound("explode");
     entityManager.toRemove(this.id);
   }
 

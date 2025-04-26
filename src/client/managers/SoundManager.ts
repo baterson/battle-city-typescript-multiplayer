@@ -9,33 +9,47 @@ export class SoundManager<T extends TrackNames> {
 
   // TODO: uncomment
   constructor(trackNames: (string | { trackName: string; loop: boolean })[]) {
-    // this.setupTracks(trackNames);
+    this.setupTracks(trackNames);
+  }
+
+  checkSounds(sounds) {
+    Object.entries(sounds).forEach(([key, value]) => {
+      if (value) {
+        this.play(key);
+      } else {
+        this.pause(key);
+      }
+    });
   }
 
   setupTracks(trackNames: (string | { trackName: string; loop: boolean })[]) {
-    // this.tracks = trackNames.reduce((acc, track) => {
-    //   if (typeof track === "string") {
-    //     acc[track] = assetsHolder.audio[track].cloneNode();
-    //   } else {
-    //     const { trackName, loop } = track;
-    //     acc[trackName] = assetsHolder.audio[trackName].cloneNode();
-    //     acc[trackName].loop = loop;
-    //   }
-    //   return acc;
-    // }, {});
+    this.tracks = trackNames.reduce((acc, track) => {
+      if (typeof track === "string") {
+        acc[track] = assetsHolder.audio[track].cloneNode();
+      } else {
+        const { trackName, loop } = track;
+        acc[trackName] = assetsHolder.audio[trackName].cloneNode();
+        acc[trackName].loop = loop;
+      }
+      return acc;
+    }, {});
   }
 
   play(trackName: T) {
-    // return this.tracks[trackName].play();
+    console.log("this.tracks", this.tracks, trackName);
+
+    return this.tracks[trackName].play();
   }
 
   pause(trackName: T) {
-    // return this.tracks[trackName].pause();
+    console.log("this.tracks", this.tracks, trackName);
+
+    return this.tracks[trackName].pause();
   }
 
   pauseAll() {
-    // Object.values<HTMLAudioElement>(this.tracks).forEach((track) =>
-    //   track.pause()
-    // );
+    Object.values<HTMLAudioElement>(this.tracks).forEach((track) =>
+      track.pause()
+    );
   }
 }

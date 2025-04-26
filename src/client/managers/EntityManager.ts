@@ -22,8 +22,10 @@ Calculates collisions between them
 export class EntityManager {
   pool: { [key: number]: Entities };
   toRemoveQueue: Set<number>;
+  game: HeadlessGame;
 
-  constructor() {
+  constructor(game: HeadlessGame) {
+    this.game = game;
     this.pool = {};
     this.toRemoveQueue = new Set();
   }
@@ -153,8 +155,8 @@ export class EntityManager {
 
       const secondPlayer = this.getSecondPlayer();
       Object.values(this.pool)
-        .filter((entity) => entity.id !== secondPlayer.id)
-        .forEach((entity) => entity.deconstruct());
+        .filter((entity) => entity.id !== secondPlayer?.id)
+        .forEach((entity) => entity?.deconstruct());
       this.pool = { [player.id]: player, [secondPlayer.id]: secondPlayer };
     } else {
       Object.values(this.pool).forEach((entity) => entity.deconstruct());

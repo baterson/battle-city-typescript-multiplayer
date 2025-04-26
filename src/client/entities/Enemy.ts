@@ -8,7 +8,7 @@ import {
   FREEZE_FRAMES,
   ENEMY_STATS,
 } from "../constants";
-import { SoundManager, TimeManager } from "../managers";
+import { TimeManager } from "../managers";
 import { powerupEvents } from "./Powerup";
 import { isPlayer, isEnemy, isBullet, isPowerup } from "./guards";
 import { HeadlessGame } from "../HeadlessGame";
@@ -31,7 +31,6 @@ export class Enemy extends Tank {
   // sets when entity changes the direction
   prevTile: Vector;
   timeManager: TimeManager<"spawn" | "death" | "freeze" | "shotCD">;
-  soundManager: SoundManager<"explode">;
 
   constructor(type: TankTypes, position: Vector) {
     super(position, { ...TANK_SIZE }, Direction.Bottom);
@@ -39,7 +38,6 @@ export class Enemy extends Tank {
     this.lives = ENEMY_STATS[type].lives;
     this.prevTile = { ...position };
     this.timeManager = new TimeManager();
-    this.soundManager = new SoundManager(["explode"]);
 
     this.timeManager.setTimer("spawn", SPAWN_FRAMES);
     powerupEvents.subscribe(this.id, powerupObserver.bind(this));

@@ -5,7 +5,7 @@ import {
   POWERUP_SPAWN_CD,
   POWERUP_BLINK_FRAMES,
 } from "../constants";
-import { SoundManager, TimeManager } from "../managers";
+import { TimeManager } from "../managers";
 import { assetsHolder } from "../utils";
 import { isPlayer } from "./guards";
 import type { HeadlessGame } from "../HeadlessGame";
@@ -36,14 +36,12 @@ export const powerupEvents = new PowerupEvents();
 export class Powerup extends Entity {
   entityType = "Powerup";
   public type: PowerupTypes;
-  public soundManager: SoundManager<"powerup">;
   public timeManager: TimeManager<"live" | "blink">;
 
   constructor(type: PowerupTypes, position: Vector) {
     super(position, { ...POWERUP_SIZE });
     this.type = type;
     this.timeManager = new TimeManager();
-    this.soundManager = new SoundManager(["powerup"]);
     this.timeManager.setTimer("live", POWERUP_SPAWN_CD);
   }
 
@@ -75,7 +73,7 @@ export class Powerup extends Entity {
     if (isPlayer(other)) {
       entityManager.toRemove(this.id);
       powerupEvents.notify(this.type, entityManager, other);
-      this.soundManager.play("powerup");
+      entityManager.game.playSound("powerup");
     }
   }
 }

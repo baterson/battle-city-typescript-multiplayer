@@ -10,7 +10,7 @@ import {
 import { BULLET_VELOCITY, BULLET_SIZE } from "../constants";
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
-import { EntityManager, SoundManager } from "../managers/";
+import { EntityManager } from "../managers/";
 import { TileMap, bulletThrough } from "../TileMap";
 import { isPlayer, isEnemy, isPowerup } from "./guards";
 import { assetsHolder } from "../utils";
@@ -20,13 +20,11 @@ export class Bullet extends Movable {
   prevPosition: Vector;
   direction: Direction;
   shooter: Player | Enemy;
-  soundManager: SoundManager<"hit" | "hitdmg">;
 
   constructor(position: Vector, direction: Direction, shooter: Player | Enemy) {
     super(position, { ...BULLET_SIZE }, direction);
     this.direction = direction;
     this.shooter = shooter;
-    this.soundManager = new SoundManager(["hit", "hitdmg"]);
   }
 
   update() {
@@ -54,9 +52,9 @@ export class Bullet extends Movable {
       isPlayer(this.shooter) && this.shooter.power === PlayerPower.Second;
     const hasSteel = tiles.some((tile) => tile.type === Tiles.Steel);
     if (hasSteel) {
-      this.soundManager.play("hit");
+      entityManager.game.playSound("hit");
     } else {
-      this.soundManager.play("hitdmg");
+      entityManager.game.playSound("hitdmg");
     }
 
     tiles.forEach((tile) => {
@@ -72,7 +70,7 @@ export class Bullet extends Movable {
   resolveEntityCollision(other: Entities, entityManager: EntityManager) {
     if (isPowerup(other)) return;
     if (isPlayer(this.shooter) && isEnemy(other) && other.type >= 1) {
-      this.soundManager.play("hit");
+      entityManager.game.playSound("hit");
     }
 
     if (entityManager._isInteractive(other)) {

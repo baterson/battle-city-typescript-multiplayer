@@ -9,7 +9,7 @@ import { TileMap } from "./TileMap";
 import { Stage } from "./Stage";
 import { EntityManager, TimeManager } from "./managers";
 import { Keyboard } from "./Keyboard";
-
+import type { TrackNames } from "./types";
 export class HeadlessGame {
   isStartScreen: boolean;
   isLost: boolean;
@@ -19,16 +19,25 @@ export class HeadlessGame {
   stage: Stage;
   timeManager: TimeManager<"screenFade">;
   loopTimerId?: ReturnType<typeof setTimeout>;
-  //   soundManager: SoundManager<"gameover">;
+  sounds: { [key in TrackNames]: boolean };
 
   constructor() {
     this.isStartScreen = false;
     this.isLost = false;
     this.isPaused = false;
-    this.entityManager = new EntityManager();
+    this.entityManager = new EntityManager(this);
     this.timeManager = new TimeManager();
     this.keyboard = new Keyboard();
-    // this.soundManager = new SoundManager(["gameover"]);
+    this.sounds = {
+      explode: false,
+      hit: false,
+      hitdmg: false,
+      neutral: false,
+      powerup: false,
+      move: false,
+      start: false,
+      gameover: false,
+    };
   }
 
   onUpdate() {}
@@ -42,6 +51,7 @@ export class HeadlessGame {
       isPaused: this.isPaused,
       stage: this.stage.toJSON(),
       entities: this.entityManager.toJSON(),
+      sounds: this.sounds,
     };
   }
 
@@ -150,5 +160,22 @@ export class HeadlessGame {
 
   resume() {
     this.isPaused = false;
+  }
+
+  playSound(trackName: TrackNames, loop = false) {
+    this.sounds[trackName] = true;
+    if (!loop) {
+      setTimeout(() => {
+        this.sounds[trackName] = false;
+      }, 3000);
+    }
+  }
+
+  pauseSound(trackName: TrackNames) {
+    this.sounds[trackName] = false;
+  }
+
+  pauseAllSounds() {
+    Object.values(this.sounds).forEach((sound) => (sound = false));
   }
 }
