@@ -1,21 +1,21 @@
 import { randomUUID } from "crypto";
+import { WebSocket } from "ws";
 import { HeadlessGame } from "../client/HeadlessGame";
 
-const DISCONNECT_TIMEOUT = 2000;
+const DISCONNECT_TIMEOUT = 5000;
 
-type Connection = {
+export type Connection = {
   ws: WebSocket | null;
-  connectionId: string;
-  disconnectTimer?: number;
-  playerType: playerType;
+  disconnectTimer?: ReturnType<typeof setTimeout>;
+  playerType: PlayerType;
 };
 
-type playerType = "Player" | "SecondPlayer";
+export type PlayerType = "Player" | "SecondPlayer";
 
 class Room {
   roomId: string;
   connections: Connection[];
-  game?;
+  game: HeadlessGame | null;
 
   constructor() {
     this.roomId = randomUUID();
@@ -23,27 +23,28 @@ class Room {
     this.game = null;
   }
 
-  addPlayer(ws, playerType) {
+  onCleanup(roomId: string) {}
+
+  addPlayer(ws: WebSocket, playerType: PlayerType) {
     if (this.connections.length >= 2) {
       ws.send(JSON.stringify({ type: "ERROR", data: "Room full" }));
       ws.close();
       return;
     }
 
-    const connectionId = randomUUID();
-    const conn = { ws, connectionId, playerType };
+    const conn = { ws, playerType };
     this.connections.push(conn);
     this.bindConnection(conn);
 
-    ws.send(
+    conn.ws.send(
       JSON.stringify({
         type: "JOINED_ROOM",
-        data: { roomId: this.roomId, connectionId, playerType },
+        data: { roomId: this.roomId, playerType },
       })
     );
   }
 
-  broadcast(msg) {
+  broadcast(msg: object) {
     for (const connection of this.connections) {
       if (connection.ws?.readyState === WebSocket.OPEN) {
         connection.ws.send(JSON.stringify(msg));
@@ -58,21 +59,15 @@ class Room {
 
     console.log("---Cleanup Room---", this.roomId);
 
-    this.isDestroyed = true;
     this.connections = [];
     this.game = null;
   }
 
-  handleDisconnect(connectionId: string) {
-    const conn = this.connections.find((c) => c.connectionId === connectionId);
+  handleDisconnect(playerType: PlayerType) {
+    const conn = this.connections.find((c) => c.playerType === playerType);
     if (!conn) return;
 
-    if (this.connections.length === 1) {
-      // Disconnect in create
-      this.destroyRoom();
-      return;
-    }
-
+    conn.ws?.removeAllListeners();
     conn.ws = null;
 
     this.broadcast({ type: "PLAYER_LEFT" });
@@ -86,8 +81,8 @@ class Room {
     );
   }
 
-  handleReconnect(ws: WebSocket, connectionId: string) {
-    const conn = this.connections.find((c) => c.connectionId === connectionId);
+  handleReconnect(ws: WebSocket, playerType: PlayerType) {
+    const conn = this.connections.find((c) => c.playerType === playerType);
 
     if (!conn) {
       return ws.send(
@@ -120,30 +115,27 @@ class Room {
     }
   }
 
-  bindConnection({
-    ws,
-    connectionId,
-  }: {
-    ws: WebSocket;
-    connectionId: string;
-  }) {
+  bindConnection({ ws, playerType }: Connection) {
     if (!ws) return;
 
-    ws.on("message", (msg) => {
+    ws.on("message", (msg: string) => {
       if (!this.game) return;
+
       this.game.keyboard.handleMessage(JSON.parse(msg));
     });
 
     ws.on("close", () => {
-      this.handleDisconnect(connectionId);
+      this.handleDisconnect(playerType);
     });
 
-    ws.on("error", (err) => {});
+    ws.on("error", (err) => {
+      this.handleDisconnect(playerType);
+    });
   }
 
   startGame() {
+    // todo: remove?
     if (this.game) {
-      console.log("--Game is already started--", this.isDestroyed);
       return;
     }
 
@@ -170,24 +162,30 @@ class Room {
 export class RoomManager {
   rooms: Record<string, Room> = {};
 
-  cleanupRoom = (roomId) => {
+  getRoom(roomId: string) {
+    return this.rooms[roomId];
+  }
+
+  cleanupRoom(roomId: string) {
     delete this.rooms[roomId];
-  };
+  }
 
   createRoom() {
     const room = new Room();
-    room.onCleanup = this.cleanupRoom;
+    room.onCleanup = (roomId: string) => this.cleanupRoom(roomId);
     this.rooms[room.roomId] = room;
     console.log("createRoom", Object.keys(this.rooms));
 
     return room;
   }
 
-  findWaitingRoom() {
+  findWaitingRoom(playerType: PlayerType) {
     const room = Object.values(this.rooms).find(
-      (r) => r.connections.length === 1 && !r.game
+      (r) =>
+        r.connections.length === 1 &&
+        r.connections[0].playerType !== playerType &&
+        !r.game
     );
-    console.log("findWaitingRoom", Object.keys(this.rooms));
     return room;
   }
 }

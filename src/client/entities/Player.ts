@@ -52,7 +52,7 @@ export class Player extends Tank {
   timeManager: TimeManager<"spawn" | "death" | "invincible" | "shotCD">;
   soundManager: SoundManager<"explode" | "neutral" | "move">;
 
-  constructor(spawnPosition: Vector) {
+  constructor(spawnPosition: Vector = PLAYER_SPAWN_POSITION) {
     super({ ...spawnPosition }, { ...TANK_SIZE }, Direction.Top);
     this.lives = 3;
     this.power = PlayerPower.Default;
@@ -132,9 +132,9 @@ export class Player extends Tank {
       );
     } else if (invincible) {
       // TODO: fix it
-      //   const invincibleSprites = assetsHolder.sprites.invincible;
-      //   const index = invincible % invincibleSprites.length;
-      //   invincibleSprites[index](this.position, this.size);
+      // const invincibleSprites = assetsHolder.sprites.invincible;
+      // const index = invincible % invincibleSprites.length;
+      // invincibleSprites[index](this.position, this.size);
     }
 
     this.animateMovement(

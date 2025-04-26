@@ -14,9 +14,11 @@ export class HeadlessGame {
   isStartScreen: boolean;
   isLost: boolean;
   isPaused: boolean;
+  entityManager: EntityManager;
+  keyboard: Keyboard;
   stage: Stage;
   timeManager: TimeManager<"screenFade">;
-  loopTimerId: number;
+  loopTimerId?: ReturnType<typeof setTimeout>;
   //   soundManager: SoundManager<"gameover">;
 
   constructor() {
@@ -30,6 +32,7 @@ export class HeadlessGame {
   }
 
   onUpdate() {}
+  onGameOver() {}
 
   toJSON() {
     return {

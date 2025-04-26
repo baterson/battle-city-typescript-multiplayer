@@ -1,7 +1,7 @@
 import { createServer } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { assetsHolder } from "../client/utils/assetsHolder";
-import { RoomManager } from "./RoomManager";
+import { PlayerType, RoomManager } from "./RoomManager";
 
 const PORT = 8080;
 
@@ -15,8 +15,8 @@ const roomManager = new RoomManager();
 server.on("upgrade", (req, socket, head) => {
   const url = new URL(req.url ?? "", `http://${req.headers.host}`);
   const action = url.searchParams.get("action");
+  const playerType = url.searchParams.get("playerType");
   const roomId = url.searchParams.get("roomId");
-  const connectionId = url.searchParams.get("connectionId");
 
   wss.handleUpgrade(req, socket, head, (ws) => {
     switch (action) {
@@ -26,7 +26,7 @@ server.on("upgrade", (req, socket, head) => {
         return;
       }
       case "find": {
-        const waiting = roomManager.findWaitingRoom();
+        const waiting = roomManager.findWaitingRoom("SecondPlayer");
         if (!waiting) {
           ws.send(
             JSON.stringify({ type: "ERROR", data: "No rooms available" })
@@ -40,17 +40,17 @@ server.on("upgrade", (req, socket, head) => {
         return;
       }
       case "reconnect": {
-        const room = roomManager.rooms[roomId];
+        const room = roomManager.getRoom(roomId as string);
         console.log("reconnect room", Object.keys(roomManager.rooms), roomId);
 
-        if (!room || !connectionId) {
+        if (!room) {
           ws.send(JSON.stringify({ type: "ERROR", data: "Room not found" }));
           ws.close();
         } else if (room?.game?.isLost) {
           ws.send(JSON.stringify({ type: "ERROR", data: "Game is lost" }));
           ws.close();
         } else {
-          room.handleReconnect(ws, connectionId);
+          room.handleReconnect(ws, playerType as PlayerType);
         }
         return;
       }
@@ -64,7 +64,5 @@ server.on("upgrade", (req, socket, head) => {
 });
 
 server.listen(PORT, () => {
-  console.log(
-    `WebSocket matchmaking server listening on ws://localhost:${PORT}`
-  );
+  console.log(`WebSocket server listening on ws://localhost:${PORT}`);
 });

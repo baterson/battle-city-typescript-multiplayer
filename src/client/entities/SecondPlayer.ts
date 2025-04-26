@@ -16,6 +16,7 @@ import {
   SPAWN_FRAMES,
   DEATH_FRAMES,
   INVINCIBLE_FRAMES,
+  SECOND_PLAYER_SPAWN_POSITION,
 } from "../constants";
 import { powerupEvents } from "./Powerup";
 import { EntityManager, SoundManager, TimeManager } from "../managers";
@@ -53,7 +54,7 @@ export class SecondPlayer extends Tank {
   timeManager: TimeManager<"spawn" | "death" | "invincible" | "shotCD">;
   soundManager: SoundManager<"explode" | "neutral" | "move">;
 
-  constructor(spawnPosition: Vector) {
+  constructor(spawnPosition: Vector = SECOND_PLAYER_SPAWN_POSITION) {
     super({ ...spawnPosition }, { ...TANK_SIZE }, Direction.Top);
     this.lives = 3;
     this.power = PlayerPower.Default;
@@ -145,8 +146,6 @@ export class SecondPlayer extends Tank {
 
   processInput(game: HeadlessGame) {
     const key = game.keyboard.getKey(this.entityType);
-    // console.log("SecondPlayer", key);
-
     let isMoving = true;
 
     if (key === ControlKeys.ArrowUp) {
@@ -212,8 +211,8 @@ export class SecondPlayer extends Tank {
     this.soundManager.pauseAll();
     this.timeManager.setTimer("spawn", SPAWN_FRAMES);
     this.timeManager.setTimer("invincible", INVINCIBLE_FRAMES);
-    this.position = { ...PLAYER_SPAWN_POSITION };
-    this.prevPosition = { ...PLAYER_SPAWN_POSITION };
+    this.position = { ...SECOND_PLAYER_SPAWN_POSITION };
+    this.prevPosition = { ...SECOND_PLAYER_SPAWN_POSITION };
   }
 
   deconstruct() {

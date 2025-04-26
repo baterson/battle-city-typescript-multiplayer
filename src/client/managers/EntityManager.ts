@@ -32,7 +32,7 @@ export class EntityManager {
     return Object.values(this.pool).map((entity) => entity.toJSON());
   }
 
-  spawnEntity(type: "Player", spawnPosition: Vector);
+  spawnEntity(type: "Player" | "SecondPlayer", spawnPosition: Vector);
   spawnEntity(type: "Flag");
   spawnEntity(type: "Enemy", tankType: TankTypes, position: Vector);
   spawnEntity(type: "Powerup", powerupType: PowerupTypes, position: Vector);

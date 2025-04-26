@@ -59,7 +59,7 @@ export const POWERUP_BLINK_FRAMES = 200;
 export const ENEMY_SPAWN_CD = 50;
 // TODO: c
 // export const SCREEN_FADE_FRAMES = 300;
-export const SCREEN_FADE_FRAMES = 150;
+export const SCREEN_FADE_FRAMES = 1;
 
 // Stage
 export const ENEMY_SPAWN_POSITION = [

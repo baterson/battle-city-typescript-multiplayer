@@ -32,22 +32,26 @@ export class Renderer {
     this.renderEntities();
     tileMap.renderLayer(Layers.over);
 
-    if (this.state.screenFadeLeft) {
-      console.log("---this.state.screenFadeLeft", this.state.gameOverFadeLeft);
+    const player = this.state.entities.find((e: any) => e.type === "Player");
+    const lives = player?.lives ?? 0;
+    dashboard.render(lives, stageNum + 1, this.state.stage.tanks);
 
-      mainScreen.renderChaingingStage(this.state.screenFadeLeft);
-    } else if (this.state.isLost) {
-      console.log(
-        "---this.state.gameOverFadeLeft",
-        this.state.gameOverFadeLeft
-      );
-      mainScreen.renderGameOver(this.state.gameOverFadeLeft);
-    } else {
-      // TODO: handle second player
-      const player = this.state.entities.find((e: any) => e.type === "Player");
-      const lives = player?.lives ?? 0;
-      dashboard.render(lives, stageNum + 1, this.state.stage.tanks);
-    }
+    // if (this.state.screenFadeLeft) {
+    //   console.log("---this.state.screenFadeLeft", this.state.gameOverFadeLeft);
+
+    //   mainScreen.renderChaingingStage(this.state.screenFadeLeft);
+    // } else if (this.state.isLost) {
+    //   console.log(
+    //     "---this.state.gameOverFadeLeft",
+    //     this.state.gameOverFadeLeft
+    //   );
+    //   mainScreen.renderGameOver(this.state.gameOverFadeLeft);
+    // } else {
+    //   // TODO: handle second player
+    //   const player = this.state.entities.find((e: any) => e.type === "Player");
+    //   const lives = player?.lives ?? 0;
+    //   dashboard.render(lives, stageNum + 1, this.state.stage.tanks);
+    // }
   }
 
   renderEntities() {

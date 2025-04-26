@@ -102,7 +102,7 @@
       import { assetsHolder } from "./utils/assetsHolder";
       import { Renderer } from "./Renderer";
 
-      //   assetsHolder.runPreloader();
+      // assetsHolder.runPreloader();
       await Promise.all([
         assetsHolder.loadSprite(sprite),
         assetsHolder.loadAudio({
@@ -150,14 +150,14 @@
         view = viewName;
       }
 
-      function persistConnection({ roomId, connectionId, playerType }) {
+      function persistConnection({ roomId, playerType }) {
         sessionStorage.setItem("roomId", roomId);
-        sessionStorage.setItem("connectionId", connectionId);
+        sessionStorage.setItem("playerType", playerType);
       }
 
       function clearConnection() {
         sessionStorage.removeItem("roomId");
-        sessionStorage.removeItem("connectionId");
+        sessionStorage.removeItem("playerType");
       }
 
       function clearRoom() {
@@ -211,18 +211,20 @@
               }
 
               return;
-
-            case "ROOM_DESTROYED":
-              console.log("👋 Room destroyed");
               clearConnection();
               clearRoom();
               setView("lobby");
               ws.close();
               ws = null;
               return;
-
+            case "ROOM_DESTROYED":
             case "ERROR":
-              console.error("⚠️", msg.type, msg.data);
+              if (msg.type === "ERROR") {
+                console.error("⚠️", msg.type, msg.data);
+              } else {
+                console.log("👋 Room destroyed");
+              }
+
               clearConnection();
               clearRoom();
               setView("lobby");
@@ -235,6 +237,7 @@
         ws.onclose = () => {
           console.log("❌ WS closed");
 
+          game?.clear();
           ws = null;
           game = null;
           setView("lobby");
@@ -270,15 +273,13 @@
 
       function tryReconnect() {
         const roomId = sessionStorage.getItem("roomId");
-        const connectionId = sessionStorage.getItem("connectionId");
+        const playerType = sessionStorage.getItem("playerType");
 
-        if (roomId && connectionId) {
-          console.log("---Found room--");
-
+        if (roomId && playerType) {
           const url = new URL(`ws://${location.hostname}:8080/`);
           url.searchParams.set("action", "reconnect");
           url.searchParams.set("roomId", roomId);
-          url.searchParams.set("connectionId", connectionId);
+          url.searchParams.set("playerType", playerType);
           ws = new WebSocket(url);
           bindConnection(ws);
         }
