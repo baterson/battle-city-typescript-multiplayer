@@ -82,7 +82,7 @@ export class HeadlessGame {
 
     const flag = this.entityManager.getFlag();
 
-    if (!player || !secondPlayer || flag.isDestroyed) {
+    if ((!player && !secondPlayer) || flag.isDestroyed) {
       this.entityManager.clear();
       return this.gameOver();
     }

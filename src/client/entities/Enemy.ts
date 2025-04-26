@@ -150,7 +150,10 @@ export class Enemy extends Tank {
   }
 
   resolveEntityCollision(other, entityManager) {
-    if (isPowerup(other)) {
+    const spawn = this.timeManager.getTimer("spawn");
+    const death = this.timeManager.getTimer("death");
+
+    if (isPowerup(other) || spawn || death) {
       return;
     } else if (isBullet(other) && isPlayer(other.shooter)) {
       if (this.lives === 1) {

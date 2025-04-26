@@ -74,6 +74,9 @@ export class Bullet extends Movable {
     if (isPlayer(this.shooter) && isEnemy(other) && other.type >= 1) {
       this.soundManager.play("hit");
     }
-    entityManager.toRemove(this.id);
+
+    if (entityManager._isInteractive(other)) {
+      entityManager.toRemove(this.id);
+    }
   }
 }
