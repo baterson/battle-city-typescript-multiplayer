@@ -9,7 +9,6 @@ npm install
 ## Run dev server
 
 ```bash
-npm install
 npm run dev
 ```
 
