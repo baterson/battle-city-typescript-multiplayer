@@ -79,6 +79,12 @@ export class Renderer {
           const frames = assetsHolder.sprites.player[power][direction];
           const draw = frames[spriteIndex];
           draw(position, size);
+
+          if (invincibleTime) {
+            const invincibleSprites = assetsHolder.sprites.invincible;
+            const index = invincibleTime % invincibleSprites.length;
+            invincibleSprites[index](position, size);
+          }
           break;
         }
 

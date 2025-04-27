@@ -128,7 +128,6 @@ export class Player extends Tank {
 
   processInput(game: HeadlessGame) {
     const key = game.keyboard.getKey(this.entityType);
-    // console.log("Player key", key);
 
     let isMoving = true;
 

@@ -15,23 +15,21 @@ export const BULLET_VELOCITY = 600;
 export const POWERUP_SIZE = { x: 40, y: 40 };
 export const PLAYER_STATS = {
   [types.PlayerPower.Default]: {
-    // velocity: 100,
-    velocity: 300,
-    // shotCD: 30,
-    shotCD: 10,
+    velocity: 180,
+    shotCD: 20,
   },
   [types.PlayerPower.First]: {
-    velocity: 120,
-    shotCD: 40,
+    velocity: 200,
+    shotCD: 20,
   },
   [types.PlayerPower.Second]: {
-    velocity: 150,
-    shotCD: 30,
+    velocity: 220,
+    shotCD: 20,
   },
 };
 export const ENEMY_STATS = {
   [types.TankTypes.Default]: {
-    velocity: 100,
+    velocity: 140,
     shotCD: 70,
     lives: 1,
   },
@@ -41,22 +39,22 @@ export const ENEMY_STATS = {
     lives: 1,
   },
   [types.TankTypes.Armored]: {
-    velocity: 120,
+    velocity: 140,
     shotCD: 70,
     lives: 3,
   },
 };
 
 // Timers
-export const DEATH_FRAMES = 35;
-export const SPAWN_FRAMES = 35;
-export const INVINCIBLE_FRAMES = 200;
-export const FREEZE_FRAMES = 200;
+export const DEATH_FRAMES = 25;
+export const SPAWN_FRAMES = 25;
+export const INVINCIBLE_FRAMES = 100;
+export const FREEZE_FRAMES = 100;
 // export const POWERUP_SPAWN_CD = 600;
 export const POWERUP_SPAWN_CD = 100;
 export const POWERUP_BLINK_FRAMES = 200;
 // export const ENEMY_SPAWN_CD = 400;
-export const ENEMY_SPAWN_CD = 50;
+export const ENEMY_SPAWN_CD = 200;
 // TODO: c
 // export const SCREEN_FADE_FRAMES = 300;
 export const SCREEN_FADE_FRAMES = 1;
