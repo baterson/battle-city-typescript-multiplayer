@@ -149,14 +149,22 @@ export class EntityManager {
   clear(clearPlayer = true) {
     if (!clearPlayer) {
       const player = this.getFirstPlayer();
-      Object.values(this.pool)
-        .filter((entity) => entity.id !== player.id)
-        .forEach((entity) => entity.deconstruct());
+      this.pool = {};
+      if (player) {
+        Object.values(this.pool)
+          .filter((entity) => entity.id !== player.id)
+          .forEach((entity) => entity.deconstruct());
+        this.pool[player.id] = player;
+      }
 
       const secondPlayer = this.getSecondPlayer();
-      Object.values(this.pool)
-        .filter((entity) => entity.id !== secondPlayer?.id)
-        .forEach((entity) => entity?.deconstruct());
+      if (secondPlayer) {
+        Object.values(this.pool)
+          .filter((entity) => entity.id !== secondPlayer?.id)
+          .forEach((entity) => entity?.deconstruct());
+        this.pool[secondPlayer.id] = secondPlayer;
+      }
+
       this.pool = { [player.id]: player, [secondPlayer.id]: secondPlayer };
     } else {
       Object.values(this.pool).forEach((entity) => entity.deconstruct());

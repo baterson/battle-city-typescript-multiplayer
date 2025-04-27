@@ -65,6 +65,7 @@ export class Player extends Tank {
   toJSON() {
     return {
       ...super.toJSON(),
+      invincibleTime: this.timeManager.getTimer("invincible"),
       lives: this.lives,
       power: this.power,
     };
@@ -118,11 +119,6 @@ export class Player extends Tank {
         death,
         "tankDestruction"
       );
-    } else if (invincible) {
-      // TODO: fix it
-      // const invincibleSprites = assetsHolder.sprites.invincible;
-      // const index = invincible % invincibleSprites.length;
-      // invincibleSprites[index](this.position, this.size);
     }
 
     this.animateMovement(

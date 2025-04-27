@@ -36,14 +36,10 @@ export class SoundManager<T extends TrackNames> {
   }
 
   play(trackName: T) {
-    console.log("this.tracks", this.tracks, trackName);
-
-    return this.tracks[trackName].play();
+    return this.tracks[trackName].play().catch((e) => {});
   }
 
   pause(trackName: T) {
-    console.log("this.tracks", this.tracks, trackName);
-
     return this.tracks[trackName].pause();
   }
 

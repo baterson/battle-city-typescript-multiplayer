@@ -110,7 +110,16 @@ class Room {
     this.bindConnection(conn);
 
     if (this.connections.every((c) => c.ws) && this.game) {
-      this.broadcast({ type: "START_GAME", data: this.game.toJSON() });
+      this.connections.forEach((c) => {
+        c.ws?.send(
+          JSON.stringify({
+            type: "START_GAME",
+            data: this.game.toJSON(),
+            playerType: c.playerType,
+          })
+        );
+      });
+
       this.game.resume();
     }
   }
@@ -155,7 +164,15 @@ class Room {
     this.game.play();
     this.game.createLoop();
 
-    this.broadcast({ type: "START_GAME", data: this.game.toJSON() });
+    this.connections.forEach((c) => {
+      c.ws?.send(
+        JSON.stringify({
+          type: "START_GAME",
+          data: this.game.toJSON(),
+          playerType: c.playerType,
+        })
+      );
+    });
   }
 }
 

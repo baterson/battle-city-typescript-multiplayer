@@ -134,6 +134,9 @@
         "start",
         "gameover",
       ]);
+      window.addEventListener("beforeunload", () => {
+        soundManager.pauseAll();
+      });
 
       let ws, game, playerType;
 
@@ -148,12 +151,13 @@
           lobby.style.display = "block";
           game.style.display = "none";
           waiting.style.display = "none";
+          soundManager.pauseAll();
         } else if (view === "waiting") {
           console.log("waiting....");
-
           lobby.style.display = "none";
           game.style.display = "none";
           waiting.style.display = "block";
+          soundManager.pauseAll();
         } else if (view === "game") {
           lobby.style.display = "none";
           game.style.display = "block";
@@ -193,6 +197,9 @@
 
           switch (msg.type) {
             case "START_GAME":
+              console.log("msg.playerType", msg.playerType);
+
+              playerType = msg.playerType;
               game = new Renderer(ws);
               game.keyboard.listenToEvents(ws, playerType);
               game.play();
